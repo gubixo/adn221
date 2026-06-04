@@ -4,8 +4,8 @@
   "description": "Summer reading and study schedule for ADN 221 MedSurg/Peds at Westchester Community College",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#080C10",
-  "theme_color": "#080C10",
+  "background_color": "#F8F5F0",
+  "theme_color": "#F8F5F0",
   "orientation": "portrait-primary",
   "icons": [
     {
