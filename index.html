@@ -113,11 +113,18 @@
 <div class="header">
   <div class="eyebrow">westchester community college · adn 221 · fall 2026</div>
   <h1><span style="color:#7be2d3">summer reading &amp;</span><br><em id="h1-em" style="color:#ffd037">study schedule</em></h1>
-  <p class="subtitle">13 weeks · june 2 – aug 31 · ~770 pages total · ~59 pages/week · classes start sept 1</p>
+  <p class="subtitle" id="subtitle">13 weeks · june 2 – aug 31 · ~770 pages total · ~59 pages/week · classes start sept 1</p>
   <div class="unit-strip" id="unit-strip"></div>
   <div class="prog-card">
     <div class="prog-row"><span>weeks with all readings checked off</span><span id="prog-label">0 / 13</span></div>
     <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div id="reschedule-bar" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="flex:1;min-width:160px">
+      <div style="font-size:11px;letter-spacing:2px;font-family:monospace;color:var(--dim);margin-bottom:5px;text-transform:lowercase">start date</div>
+      <input type="date" id="start-input" style="font-family:Helvetica,Arial,sans-serif;font-size:14px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;background:var(--bg);color:var(--text);width:100%">
+    </div>
+    <button id="reschedule-btn" style="background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-family:Helvetica,Arial,sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0">reschedule →</button>
   </div>
 </div>
 
