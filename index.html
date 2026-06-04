@@ -124,7 +124,7 @@
       <div style="font-size:11px;letter-spacing:2px;font-family:monospace;color:var(--dim);margin-bottom:5px;text-transform:lowercase">start date</div>
       <input type="date" id="start-input" style="font-family:Helvetica,Arial,sans-serif;font-size:14px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;background:var(--bg);color:var(--text);width:100%">
     </div>
-    <button id="reschedule-btn" style="background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-family:Helvetica,Arial,sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0">reschedule →</button>
+    <button id="reschedule-btn" style="background:#9B8EC4;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-family:Helvetica,Arial,sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0">reschedule →</button>
   </div>
 </div>
 
@@ -299,6 +299,32 @@ const SWATCHES = [
 
 const COLOR_KEY = 'adn221_colors_v1';
 const CHECK_KEY = 'adn221_checks_v1';
+const DATE_KEY  = 'adn221_startdate_v1';
+
+const MONTH_NAMES = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+function loadStartDate(){ try{ return localStorage.getItem(DATE_KEY)||'2025-06-02'; }catch(e){ return '2025-06-02'; } }
+function saveStartDate(d){ try{ localStorage.setItem(DATE_KEY,d); }catch(e){} }
+function formatDate(d){ return MONTH_NAMES[d.getMonth()]+' '+d.getDate(); }
+function calcWeekDates(startISO){
+  const start=new Date(startISO+'T00:00:00');
+  const deadline=new Date('2025-09-01T00:00:00');
+  const totalWeeks=SCHEDULE.length;
+  const totalDays=Math.floor((deadline-start)/86400000);
+  const dpw=Math.max(7,Math.round(totalDays/totalWeeks));
+  return SCHEDULE.map((w,i)=>{
+    const ws=new Date(start.getTime()+i*dpw*86400000);
+    const we=i===totalWeeks-1?new Date('2025-08-31T00:00:00'):new Date(ws.getTime()+(dpw-1)*86400000);
+    return ws.getMonth()===we.getMonth()?formatDate(ws)+'–'+we.getDate():formatDate(ws)+' – '+formatDate(we);
+  });
+}
+function updateSubtitle(startISO){
+  const start=new Date(startISO+'T00:00:00');
+  const deadline=new Date('2025-09-01T00:00:00');
+  const wks=Math.min(SCHEDULE.length,Math.max(1,Math.floor((deadline-start)/(7*86400000))));
+  const ppw=Math.ceil(770/wks);
+  const sub=document.getElementById('subtitle');
+  if(sub) sub.textContent=wks+' weeks · '+formatDate(start)+' – aug 31 · ~770 pages total · ~'+ppw+' pages/week · classes start sept 1';
+}
 
 function loadColors(){
   try{
@@ -312,6 +338,7 @@ function saveChecked(o){ try{localStorage.setItem(CHECK_KEY,JSON.stringify(o));}
 
 let colors = loadColors();
 let checked = loadChecked();
+let startDate = loadStartDate();
 
 function getColor(uid){ return colors[uid]||'#888'; }
 
@@ -354,7 +381,8 @@ function updateProgress(){
 function renderWeeks(){
   const container = document.getElementById('weeks-container');
   container.innerHTML = '';
-  SCHEDULE.forEach(week=>{
+  const weekDates = calcWeekDates(startDate);
+  SCHEDULE.forEach((week,idx)=>{
     const c = getColor(week.unit);
     const card = document.createElement('div');
     card.className = 'week-card';
@@ -368,7 +396,7 @@ function renderWeeks(){
           <div class="week-num" style="background:${c}18;border:1px solid ${c}40;color:${c}">${week.week}</div>
           <div class="week-meta">
             <div class="week-top">
-              <span class="week-date" style="color:${c}">${week.dates}</span>
+              <span class="week-date" style="color:${c}">${weekDates[idx]}</span>
               ${pageTotal?`<span class="badge" style="background:${c}15;color:${c};border:1px solid ${c}30">${pageTotal} pp</span>`:''}
               ${allDone?`<span class="badge badge-done">✓ done</span>`:''}
             </div>
@@ -487,7 +515,26 @@ document.addEventListener('click',e=>{
 // INIT
 applyColors();
 renderUnitStrip();
+const startInput = document.getElementById('start-input');
+if(startInput){
+  startInput.value = startDate;
+  startInput.min = new Date().toISOString().split('T')[0];
+  startInput.max = '2025-08-25';
+}
+updateSubtitle(startDate);
 renderWeeks();
+
+document.getElementById('reschedule-btn').addEventListener('click',()=>{
+  const val = document.getElementById('start-input').value;
+  if(!val) return;
+  startDate = val;
+  saveStartDate(val);
+  updateSubtitle(val);
+  renderWeeks();
+  const btn = document.getElementById('reschedule-btn');
+  btn.textContent = 'updated ✓';
+  setTimeout(()=>btn.textContent='reschedule →', 1500);
+});
 
 // PWA install
 let deferredPrompt;
