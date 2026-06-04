@@ -119,12 +119,20 @@
     <div class="prog-row"><span>weeks with all readings checked off</span><span id="prog-label">0 / 13</span></div>
     <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
   </div>
-  <div id="reschedule-bar" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px;overflow:hidden;box-sizing:border-box">
+  <div id="reschedule-bar" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px">
     <div>
-      <div style="font-size:11px;letter-spacing:2px;font-family:monospace;color:var(--dim);margin-bottom:5px;text-transform:lowercase">start date</div>
-      <input type="date" id="start-input" style="font-size:14px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;background:var(--bg);color:var(--text);width:100%;max-width:100%;min-width:0;display:block;box-sizing:border-box">
+      <div style="font-size:11px;letter-spacing:2px;font-family:monospace;color:var(--dim);margin-bottom:8px;text-transform:lowercase">start date</div>
+      <div style="display:flex;gap:8px">
+        <select id="start-month" style="flex:1;font-size:14px;border:1px solid var(--border);border-radius:8px;padding:7px 8px;background:var(--bg);color:var(--text);appearance:none;-webkit-appearance:none">
+          <option value="06">june</option>
+          <option value="07">july</option>
+          <option value="08">august</option>
+        </select>
+        <select id="start-day" style="flex:1;font-size:14px;border:1px solid var(--border);border-radius:8px;padding:7px 8px;background:var(--bg);color:var(--text);appearance:none;-webkit-appearance:none">
+        </select>
+      </div>
     </div>
-    <button id="reschedule-btn" style="background:#9B8EC4;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer;width:100%">reschedule →</button>
+    <button id="reschedule-btn" style="background:#9B8EC4;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer;width:100%;text-align:center">reschedule →</button>
   </div>
 </div>
 
@@ -515,18 +523,35 @@ document.addEventListener('click',e=>{
 // INIT
 applyColors();
 renderUnitStrip();
-const startInput = document.getElementById('start-input');
-if(startInput){
-  startInput.value = startDate;
-  startInput.min = new Date().toISOString().split('T')[0];
-  startInput.max = '2025-08-25';
+
+// populate day dropdown
+function populateDays(month, selectedDay){
+  const dayEl = document.getElementById('start-day');
+  const days = new Date(2025, parseInt(month), 0).getDate();
+  dayEl.innerHTML = '';
+  for(let d=1; d<=days; d++){
+    const opt = document.createElement('option');
+    opt.value = String(d).padStart(2,'0');
+    opt.textContent = d;
+    if(String(d).padStart(2,'0') === selectedDay) opt.selected = true;
+    dayEl.appendChild(opt);
+  }
 }
+
+const savedParts = startDate.split('-');
+const monthEl = document.getElementById('start-month');
+monthEl.value = savedParts[1];
+populateDays(savedParts[1], savedParts[2]);
+
+monthEl.addEventListener('change', ()=> populateDays(monthEl.value, '01'));
+
 updateSubtitle(startDate);
 renderWeeks();
 
 document.getElementById('reschedule-btn').addEventListener('click',()=>{
-  const val = document.getElementById('start-input').value;
-  if(!val) return;
+  const month = document.getElementById('start-month').value;
+  const day = document.getElementById('start-day').value;
+  const val = `2025-${month}-${day}`;
   startDate = val;
   saveStartDate(val);
   updateSubtitle(val);
