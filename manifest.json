@@ -2,7 +2,7 @@
   "name": "ADN 221 — Summer Study Schedule",
   "short_name": "ADN 221",
   "description": "Summer reading and study schedule for ADN 221 MedSurg/Peds at Westchester Community College",
-  "start_url": "/",
+  "start_url": "/adn221/",
   "display": "standalone",
   "background_color": "#F8F5F0",
   "theme_color": "#F8F5F0",
